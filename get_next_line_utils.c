@@ -29,7 +29,7 @@ char *ft_strjoin(char const *s1, char const *s2)
 	if (!s1 || !s2)
 		return (NULL);
 	str_len = ft_strlen(s1) + ft_strlen(s2) + 1;
-	str = malloc((str_len) * sizeof(char));
+	str = ft_calloc(str_len, sizeof(char));
 	if (!str)
 		return (NULL);
 	i = -1;
@@ -59,7 +59,7 @@ char *ft_substr(char const *s, unsigned int start, size_t len)
 	size_t substr_len;
 	char *substr;
 
-	if (!s || len == 0)
+	if (!s)
 		return (NULL);
 	s_len = ft_strlen(s);
 	substr_len = s_len - (size_t) start;
@@ -81,6 +81,8 @@ char *ft_substr(char const *s, unsigned int start, size_t len)
 void *ft_calloc(size_t nmemb, size_t size)
 {
 	void *pointer;
+	size_t bytes_size;
+	unsigned char *p;
 
 	if (nmemb >= 18446744073709551615UL || size >= 18446744073709551615UL
 		|| nmemb * size >= 18446744073709551615UL)
@@ -88,15 +90,10 @@ void *ft_calloc(size_t nmemb, size_t size)
 	pointer = malloc(nmemb * size);
 	if (pointer == NULL)
 		return (NULL);
-	ft_bzero(pointer, nmemb * size);
+
+	bytes_size = nmemb * size;
+	p = pointer;
+	while (bytes_size--)
+		*p++ = 0;
 	return (pointer);
-}
-
-void ft_bzero(void *s, size_t n)
-{
-	unsigned char *str;
-
-	str = s;
-	while (n--)
-		*str++ = 0;
 }

@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 42
 
 /**
  * @brief This functions can read a line from a file descriptor.
@@ -18,8 +18,6 @@ char *get_next_line(int fd);
 char *ft_strchr(const char *str, int c);
 
 char *ft_strjoin(char const *s1, char const *s2);
-
-void ft_bzero(void *s, size_t n);
 
 void *ft_calloc(size_t nmemb, size_t size);
 
