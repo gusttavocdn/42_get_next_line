@@ -59,6 +59,7 @@ dkms.conf
 CMakeLists.txt
 cmake-build-debug
 text.txt
+.vscode
 
 
 # End of https://www.toptal.com/developers/gitignore/api/c

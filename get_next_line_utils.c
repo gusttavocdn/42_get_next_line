@@ -1,99 +1,94 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gusda-si <gusda-si@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/07/19 12:43:55 by gusda-si          #+#    #+#             */
+/*   Updated: 2023/07/19 19:46:46 by gusda-si         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
-char *ft_strchr(const char *str, int c)
+/**
+ * @brief This functions founds an c character in a string.
+ *
+ * @param s The string to search
+ * @param c The char to search for in the string
+ * @return Returns a pointer to the character if found.
+ * @return Returns NULL if not found.
+ * @return If c == '\0' returns a pointer to the end of the string.
+ */
+char	*ft_strchr(const char *str, int c)
 {
-	char *s;
-
-	if (!str)
-		return (NULL);
-
-	s = (char *) str;
-	while (*s)
+	while (*str != '\0')
 	{
-		if (*s == (char) c)
-			return (s);
-		s++;
+		if (*str == (unsigned char)c)
+			return ((char *)str);
+		str++;
 	}
-	if (!c && !(*s))
-		return (s);
+	if (*str == (unsigned char)c)
+		return ((char *)str);
 	return (NULL);
 }
 
-char *ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
-	size_t str_len;
-	char *str;
-	size_t i;
-	size_t j;
+	char	*new_str;
+	size_t	len;
 
-	if (!s1 || !s2)
+	if (!s1 && !s2)
 		return (NULL);
-	str_len = ft_strlen(s1) + ft_strlen(s2) + 1;
-	str = ft_calloc(str_len, sizeof(char));
-	if (!str)
+	len = ft_strlen(s1) + ft_strlen(s2);
+	new_str = (char *)malloc((len + NULL_BYTE) * sizeof(char));
+	if (!new_str)
 		return (NULL);
-	i = -1;
-	while (s1[++i])
-		str[i] = s1[i];
-	j = -1;
-	while (s2[++j])
-		str[i + j] = s2[j];
-	str[i + j] = '\0';
-	return (str);
+	while (s1 && *s1 != '\0')
+		*new_str++ = *s1++;
+	while (s2 && *s2 != '\0')
+		*new_str++ = *s2++;
+	*new_str = '\0';
+	return ((new_str - len));
 }
 
-size_t ft_strlen(const char *s)
+size_t	ft_strlen(const char *s)
 {
-	size_t length;
-
-	length = 0;
-	while (s[length])
-		length++;
-	return (length);
-}
-
-char *ft_substr(char const *s, unsigned int start, size_t len)
-{
-	size_t i;
-	size_t s_len;
-	size_t substr_len;
-	char *substr;
+	char	*s_begin;
 
 	if (!s)
-		return (NULL);
-	s_len = ft_strlen(s);
-	substr_len = s_len - (size_t) start;
-	if (start > s_len)
-		return ((char *) ft_calloc(1, sizeof(char)));
-	if (substr_len > len)
-		substr = (char *) ft_calloc((len + 1), sizeof(char));
-	else
-		substr = (char *) ft_calloc((substr_len + 1), sizeof(char));
-	if (!substr)
-		return (NULL);
-	i = 0;
-	while (s[start] && len--)
-		substr[i++] = s[start++];
-	substr[i] = '\0';
-	return (substr);
+		return (0);
+	s_begin = (char *)s;
+	while (*s != '\0')
+		s++;
+	return ((size_t)(s - s_begin));
 }
 
-void *ft_calloc(size_t nmemb, size_t size)
+size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 {
-	void *pointer;
-	size_t bytes_size;
-	unsigned char *p;
+	size_t	str_len;
 
-	if (nmemb >= 18446744073709551615UL || size >= 18446744073709551615UL
-		|| nmemb * size >= 18446744073709551615UL)
-		return (NULL);
-	pointer = malloc(nmemb * size);
-	if (pointer == NULL)
-		return (NULL);
+	str_len = ft_strlen(src);
+	if ((size <= 0) | !dst)
+		return (str_len);
+	while (*src != '\0' && size-- > 1)
+		*dst++ = *src++;
+	*dst = '\0';
+	return (str_len);
+}
 
-	bytes_size = nmemb * size;
-	p = pointer;
-	while (bytes_size--)
-		*p++ = 0;
-	return (pointer);
+char	*ft_strdup(const char *s)
+{
+	char	*new_str;
+	size_t	size;
+
+	size = ft_strlen(s);
+	new_str = (char *)malloc((size + NULL_BYTE) * sizeof(char));
+	if (new_str == NULL)
+		return (NULL);
+	while (*s != '\0')
+		*new_str++ = *s++;
+	*new_str = '\0';
+	return ((new_str - size));
 }

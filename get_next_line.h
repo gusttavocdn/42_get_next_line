@@ -1,28 +1,42 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gusda-si <gusda-si@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/07/19 12:42:51 by gusda-si          #+#    #+#             */
+/*   Updated: 2023/07/19 20:57:25 by gusda-si         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef GET_NEXT_LINE_H
-#define GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
-#include <unistd.h>
-#include <stdlib.h>
+// Standard Library headers
+# include <stdlib.h>
+# include <unistd.h>
 
-#define BUFFER_SIZE 42
+// Constants
+# define BUFFER_SIZE 42
+# define FD_OPEN_LIMIT 1024
+# define NULL_BYTE 1
+# define LINE_BREAK_BYTE 1
+# define TRUE 1
+# define FALSE 0
 
-/**
- * @brief This functions can read a line from a file descriptor.
- *
- * @param fd The file descriptor to read from.
- * @return The line read. NULL if there is nothing
- * else to read, or an error occurred.
- */
-char *get_next_line(int fd);
+// Enum declarations
 
-char *ft_strchr(const char *str, int c);
+// Macro declarations
 
-char *ft_strjoin(char const *s1, char const *s2);
+// Struct declarations
 
-void *ft_calloc(size_t nmemb, size_t size);
+// Function declarations
+char	*get_next_line(int fd);
+char	*ft_strchr(const char *str, int c);
+size_t	ft_strlen(const char *s);
+char	*ft_strjoin(char const *s1, char const *s2);
+size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+char	*ft_strdup(const char *s);
 
-char *ft_substr(char const *s, unsigned int start, size_t len);
-
-size_t ft_strlen(const char *s);
-
-#endif //GET_NEXT_LINE_H
+#endif // GET_NEXT_LINE_H
