@@ -6,7 +6,7 @@
 /*   By: gusda-si <gusda-si@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/19 12:43:05 by gusda-si          #+#    #+#             */
-/*   Updated: 2023/07/19 20:41:54 by gusda-si         ###   ########.fr       */
+/*   Updated: 2023/07/21 13:51:41 by gusda-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,21 +41,23 @@ static void	read_file_content(int fd, char **static_buffer)
 	if (!local_buffer)
 		return ;
 	bytes_read = read(fd, local_buffer, BUFFER_SIZE);
+	if (bytes_read < 0)
+		return (free(local_buffer));
 	local_buffer[bytes_read] = '\0';
-	while (bytes_read && !ft_strchr(local_buffer, '\n'))
+	while (bytes_read > 0 && !ft_strchr(local_buffer, '\n'))
 	{
 		update_static_buffer(static_buffer, ft_strjoin(*static_buffer,
-				local_buffer));
+					local_buffer));
 		bytes_read = read(fd, local_buffer, BUFFER_SIZE);
 		local_buffer[bytes_read] = '\0';
 	}
-	if (*local_buffer == '\0' && !(*static_buffer))
+	if (*local_buffer == '\0' && (*static_buffer == NULL
+			|| **static_buffer == '\0'))
 		update_static_buffer(static_buffer, NULL);
 	else
 		update_static_buffer(static_buffer, ft_strjoin(*static_buffer,
-				local_buffer));
+					local_buffer));
 	free(local_buffer);
-	local_buffer = NULL;
 }
 
 static void	update_static_buffer(char **static_buffer, char *new_content)
@@ -103,6 +105,6 @@ static char	*make_line(size_t line_size, char **static_buffer, int is_last_line)
 		return (NULL);
 	ft_strlcpy(line, *static_buffer, line_size + NULL_BYTE + LINE_BREAK_BYTE);
 	update_static_buffer(static_buffer, ft_strdup(*static_buffer + line_size
-			+ LINE_BREAK_BYTE));
+				+ LINE_BREAK_BYTE));
 	return (line);
 }
