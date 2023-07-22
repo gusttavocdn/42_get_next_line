@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gusda-si <gusda-si@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/19 12:43:55 by gusda-si          #+#    #+#             */
-/*   Updated: 2023/07/22 08:09:32 by gusda-si         ###   ########.fr       */
+/*   Updated: 2023/07/22 08:46:27 by gusda-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,4 +91,25 @@ char	*ft_strdup(const char *s)
 		*new_str++ = *s++;
 	*new_str = '\0';
 	return ((new_str - size));
+}
+
+size_t	ft_strlcat(char *dst, const char *src, size_t size)
+{
+	size_t	dest_len;
+	size_t	src_len;
+	size_t	final_len;
+
+	src_len = ft_strlen(src);
+	if (!dst || size == 0)
+		return (src_len + size);
+	dest_len = ft_strlen(dst);
+	final_len = dest_len + src_len;
+	if (size > dest_len)
+	{
+		while ((*src != '\0') && (dest_len < size - 1))
+			dst[dest_len++] = *src++;
+		dst[dest_len] = '\0';
+		return (final_len);
+	}
+	return (src_len + size);
 }
