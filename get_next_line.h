@@ -6,7 +6,7 @@
 /*   By: gusda-si <gusda-si@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/19 12:42:51 by gusda-si          #+#    #+#             */
-/*   Updated: 2023/07/22 07:21:15 by gusda-si         ###   ########.fr       */
+/*   Updated: 2023/07/23 21:23:00 by gusda-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include <unistd.h>
 
 // Constants
-# define BUFFER_SIZE 42
+// # define BUFFER_SIZE 42
 # define FD_OPEN_LIMIT 1024
 # define NULL_BYTE 1
 # define LINE_BREAK_BYTE 1

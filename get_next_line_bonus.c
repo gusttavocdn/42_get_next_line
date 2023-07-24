@@ -6,158 +6,105 @@
 /*   By: gusda-si <gusda-si@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/19 12:43:05 by gusda-si          #+#    #+#             */
-/*   Updated: 2023/07/22 08:54:07 by gusda-si         ###   ########.fr       */
+/*   Updated: 2023/07/23 21:23:04 by gusda-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
-static void	read_file(int fd, t_queue *queue);
-static char	*get_current_line(t_queue *queue);
-static void	update_memory_pointer(char **memory_pointer, char *new_content);
-void		ft_queue_enqueue(t_queue *queue, void *data);
-t_node		*ft_queue_create_node(void *data);
-void		ft_queue_del_node(t_node *node, void (*del)(void *));
-t_node		*ft_queue_dequeue(t_queue *queue);
-
-// typedef struct s_file_info
-// {
-// 	char	*buffer;
-// 	char	*line;
-// 	size_t	line_break_index;
-// }			t_file_info;
+static void	read_file_content(int fd, char **static_buffer);
+static void	update_static_buffer(char **static_buffer, char *new_content);
+static char	*get_current_line(char **static_buffer);
+static char	*make_line(size_t line_size, char **static_buffer,
+				int is_last_line);
 
 char	*get_next_line(int fd)
 {
-	static t_queue	*file_data[FD_OPEN_LIMIT];
-	char			*line;
+	static char	*buffer[FD_OPEN_LIMIT];
+	char		*current_line;
 
 	if (fd < 0 || fd > FD_OPEN_LIMIT || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (!file_data[fd])
-	{
-		file_data[fd] = (t_queue *)malloc(sizeof(t_queue));
-		if (!file_data[fd])
-			return (NULL);
-		file_data[fd]->size = 0;
-	}
-	read_file(fd, file_data[fd]);
-	line = get_current_line(file_data[fd]);
-	return (NULL);
+	read_file_content(fd, &buffer[fd]);
+	if (!buffer[fd])
+		return (NULL);
+	current_line = get_current_line(&buffer[fd]);
+	return (current_line);
 }
-static void	read_file(int fd, t_queue *queue)
+
+static void	read_file_content(int fd, char **static_buffer)
 {
 	ssize_t	bytes_read;
-	char	buffer[BUFFER_SIZE + NULL_BYTE];
-	t_node	*current_node;
+	char	*local_buffer;
 
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	if (bytes_read < 0)
+	local_buffer = (char *)malloc((BUFFER_SIZE + NULL_BYTE) * sizeof(char));
+	if (!local_buffer)
 		return ;
-	buffer[bytes_read] = '\0';
-	if (queue->size == 0)
-		ft_queue_enqueue(queue, ft_strdup(buffer));
-	current_node = queue->head;
-	while (bytes_read && !ft_strchr(current_node->data, '\n'))
+	bytes_read = read(fd, local_buffer, BUFFER_SIZE);
+	if (bytes_read < 0)
+		return (free(local_buffer));
+	local_buffer[bytes_read] = '\0';
+	while (bytes_read > 0 && !ft_strchr(local_buffer, '\n'))
 	{
-		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		buffer[bytes_read] = '\0';
-		ft_queue_enqueue(queue, ft_strdup(buffer));
-		current_node = current_node->next;
+		update_static_buffer(static_buffer, ft_strjoin(*static_buffer,
+				local_buffer));
+		bytes_read = read(fd, local_buffer, BUFFER_SIZE);
+		local_buffer[bytes_read] = '\0';
 	}
+	if (*local_buffer == '\0' && (*static_buffer == NULL
+			|| **static_buffer == '\0'))
+		update_static_buffer(static_buffer, NULL);
+	else
+		update_static_buffer(static_buffer, ft_strjoin(*static_buffer,
+				local_buffer));
+	free(local_buffer);
 }
 
-static char	*get_current_line(t_queue *queue)
+static void	update_static_buffer(char **static_buffer, char *new_content)
 {
-	char	*buffer;
-	size_t	line_size;
+	char	*old_static_buffer_content;
+
+	old_static_buffer_content = *static_buffer;
+	*static_buffer = new_content;
+	free(old_static_buffer_content);
+	old_static_buffer_content = NULL;
+}
+
+static char	*get_current_line(char **static_buffer)
+{
+	size_t	size;
+	int		is_last_line;
 	char	*line;
 
-	if (queue->size == 0)
-		return (NULL);
-	buffer = ft_strdup(" ");
-	while (queue->size > 1)
-	{
-		update_memory_pointer(&buffer, ft_strjoin(buffer, queue->head->data));
-		ft_queue_del_node(ft_queue_dequeue(queue), free);
-	}
-	line_size = ft_strlen(buffer);
-	while (*(char *)queue->head->data != '\n' && queue->head->data)
-	{
-		line_size++;
-		queue->head->data++;
-	}
-	if (*(char *)queue->head->data == '\n')
-		line_size++;
-	line = (char *)malloc((line_size + NULL_BYTE) * sizeof(char));
-	if (!line)
-		return (NULL);
-	ft_strlcat(line, buffer, line_size + NULL_BYTE);
-	ft_strlcat(line, queue->head->data, line_size + NULL_BYTE);
-	update_memory_pointer(&queue->head->data,
-							ft_strdup(ft_strchr(queue->head->data, '\n') + 1));
+	size = 0;
+	is_last_line = FALSE;
+	while (*(*static_buffer + size) != '\n' && *(*static_buffer + size) != '\0')
+		size++;
+	if (*(*static_buffer + size) == '\0')
+		is_last_line = TRUE;
+	line = make_line(size, static_buffer, is_last_line);
 	return (line);
 }
 
-static void	update_memory_pointer(char **memory_pointer, char *new_content)
+static char	*make_line(size_t line_size, char **static_buffer, int is_last_line)
 {
-	char	*old_content;
+	char	*line;
 
-	old_content = *memory_pointer;
-	*memory_pointer = new_content;
-	free(old_content);
-	old_content = NULL;
-}
-
-void	ft_queue_enqueue(t_queue *queue, void *data)
-{
-	t_node	*new_node;
-
-	if (queue->size == 0)
+	if (is_last_line)
 	{
-		queue->head = ft_queue_create_node(data);
-		queue->tail = queue->head;
-		queue->size++;
-		return ;
+		line = (char *)malloc((line_size + NULL_BYTE) * sizeof(char));
+		if (!line)
+			return (NULL);
+		ft_strlcpy(line, *static_buffer, line_size + NULL_BYTE);
+		update_static_buffer(static_buffer, NULL);
+		return (line);
 	}
-	new_node = ft_queue_create_node(data);
-	queue->tail->next = new_node;
-	queue->tail = new_node;
-	queue->size++;
-}
-
-t_node	*ft_queue_create_node(void *data)
-{
-	t_node	*new_node;
-
-	new_node = (t_node *)malloc(sizeof(t_node));
-	if (!new_node)
+	line = (char *)malloc((line_size + NULL_BYTE + LINE_BREAK_BYTE)
+			* sizeof(char));
+	if (!line)
 		return (NULL);
-	new_node->data = data;
-	new_node->next = NULL;
-	return (new_node);
-}
-
-t_node	*ft_queue_dequeue(t_queue *queue)
-{
-	t_node	*removed_node;
-
-	if (queue->size == 0)
-		return (NULL);
-	queue->size--;
-	removed_node = queue->head;
-	queue->head = queue->head->next;
-	if (queue->size == 0)
-		queue->tail = NULL;
-	removed_node->next = NULL;
-	return (removed_node);
-}
-
-void	ft_queue_del_node(t_node *node, void (*del)(void *))
-{
-	if (!node)
-		return ;
-	del(node->data);
-	free(node);
-	node = NULL;
+	ft_strlcpy(line, *static_buffer, line_size + NULL_BYTE + LINE_BREAK_BYTE);
+	update_static_buffer(static_buffer, ft_strdup(*static_buffer + line_size
+			+ LINE_BREAK_BYTE));
+	return (line);
 }
